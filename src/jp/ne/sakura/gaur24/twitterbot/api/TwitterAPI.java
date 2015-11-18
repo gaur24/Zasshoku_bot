@@ -363,5 +363,16 @@ public class TwitterAPI {
 			FileIO.write(LAST_REPLY_ID_PATH, lastReplyID.toString());
 		}
 	}
+	
+	/**
+	 * ツイートをリツイートします
+	 * [POST statuses/retweet/:id]APIに制限はないが、1ユーザー当たりの投稿数の制限はある
+	 * 
+	 * @param statusID
+	 * @throws TwitterException
+	 */
+	public void retweetStatus(long statusID) throws TwitterException {
+		twitter.retweetStatus(statusID);
+	}
 
 }
