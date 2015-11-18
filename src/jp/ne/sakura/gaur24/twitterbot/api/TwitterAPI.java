@@ -34,6 +34,7 @@ public class TwitterAPI {
 	private final Path NOT_DESTROY_FRIENDSHIP_IDS_PATH;
 	private final Path NOT_CREATE_FRIENDSHIP_IDS_PATH;
 	private final Path LAST_REPLY_ID_PATH;
+	private final Path LAST_HOME_TIMELINE_ID_PATH;
 
 	// DestroyFriendshipしないユーザーIDのリスト
 	private static List<Long> notDestroyFriendshipIDs;
@@ -41,35 +42,42 @@ public class TwitterAPI {
 	// CreateFriendshipしないユーザーIDのリスト
 	private static List<Long> notCreateFriendshipIDs;
 
+	// 最後に取得したHomeTimelineのID
+	private static Long lastHomeTimelineID;
+
 	// 最後にリプライしたツイートのID
 	private static Long lastReplyID;
 
 	/**
-	 * 下記３つ情報を保持するファイルのパス名を渡してオブジェクトを生成する
+	 * 下記4つの情報を保持するファイルのパス名を渡してオブジェクトを生成する
 	 * <ul>
 	 * <li>フォローしないユーザーのIDリスト</li>
 	 * <li>フォローを外さないユーザーのIDリスト</li>
 	 * <li>前回リプライしたツイートのID</li>
+	 * <li>前回取得したホームタイムラインのツイートのID</li>
 	 * </ul>
 	 * 
 	 * @param twitter
-	 * @param ncfip
-	 * @param ndfip
-	 * @param lrip
+	 * @param notCreateFriendshipIDsPath
+	 * @param notDestroyFriendshipIDsPath
+	 * @param lastReplyIDPath
+	 * @param lastHomeTimelineIDPath
 	 */
-	public TwitterAPI(Twitter twitter, String ncfip, String ndfip, String lrip) {
+	public TwitterAPI(Twitter twitter, String notCreateFriendshipIDsPath, String notDestroyFriendshipIDsPath,
+			String lastReplyIDPath, String lastHomeTimelineIDPath) {
 
 		this.twitter = twitter;
-		NOT_CREATE_FRIENDSHIP_IDS_PATH = Paths.get(ncfip);
-		NOT_DESTROY_FRIENDSHIP_IDS_PATH = Paths.get(ndfip);
-		LAST_REPLY_ID_PATH = Paths.get(lrip);
+		NOT_CREATE_FRIENDSHIP_IDS_PATH = Paths.get(notCreateFriendshipIDsPath);
+		NOT_DESTROY_FRIENDSHIP_IDS_PATH = Paths.get(notDestroyFriendshipIDsPath);
+		LAST_REPLY_ID_PATH = Paths.get(lastReplyIDPath);
+		LAST_HOME_TIMELINE_ID_PATH = Paths.get(lastHomeTimelineIDPath);
 
 		// ファイル読み込み
 		try {
 			notCreateFriendshipIDs = FileIO.readAllLines(NOT_CREATE_FRIENDSHIP_IDS_PATH).stream().map(Long::valueOf)
 					.collect(Collectors.toList());
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, ncfip + "が読み込めませんでした");
+			logger.log(Level.SEVERE, notCreateFriendshipIDsPath + "が読み込めませんでした");
 			e.printStackTrace();
 			System.exit(1);
 		}
@@ -78,36 +86,63 @@ public class TwitterAPI {
 			notDestroyFriendshipIDs = FileIO.readAllLines(NOT_DESTROY_FRIENDSHIP_IDS_PATH).stream().map(Long::valueOf)
 					.collect(Collectors.toList());
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, ndfip + "が読み込めませんでした");
+			logger.log(Level.SEVERE, notDestroyFriendshipIDsPath + "が読み込めませんでした");
 			e.printStackTrace();
 			System.exit(1);
 		}
 
-		// lastReplyIDだけ別処理で読み込み
+		// lastReplyID, lastHomeTimelineIDだけ別処理で読み込み
 		try {
 			List<String> lastReplyIDList = FileIO.readAllLines(LAST_REPLY_ID_PATH);
-			// LAST_REPLY_ID_PATHが読み込めない、または値がなかった場合
+			List<String> lastHomeTimelineIDList = FileIO.readAllLines(LAST_HOME_TIMELINE_ID_PATH);
+
+			boolean isExistReplyID = true;
+			boolean isExistHomeTimelineID = true;
+
+			// ファイルが読み込めない、または値がなかった場合
 			if (lastReplyIDList == null || lastReplyIDList.isEmpty()) {
-				// タイムラインの最新のツイートのIDをlastReplyIDとする
+				isExistReplyID = false;
+			}
+			if (lastHomeTimelineIDList == null || lastHomeTimelineIDList.isEmpty()) {
+				isExistHomeTimelineID = false;
+			}
+
+			// タイムラインの最新のツイートのIDをlastReplyID, lastHomeTimelineIDとする
+			ResponseList<Status> homeTimeLine = null;
+			if (!isExistReplyID || !isExistHomeTimelineID) {
 				Paging paging = new Paging(1, 1);
-				ResponseList<Status> homeTimeLine = twitter.getHomeTimeline(paging);
+				homeTimeLine = twitter.getHomeTimeline(paging);
+			}
+
+			if (!isExistReplyID) {
 				lastReplyID = homeTimeLine.get(0).getId();
 				FileIO.write(LAST_REPLY_ID_PATH, lastReplyID.toString());
 				logger.log(Level.WARNING, "タイムラインの最新のツイートのIDをlastReplyIDとして設定し、アプリケーションを実行します。");
 			} else {
 				lastReplyID = lastReplyIDList.stream().map(Long::valueOf).collect(Collectors.toList()).get(0);
 			}
+
+			if (!isExistHomeTimelineID) {
+				lastHomeTimelineID = homeTimeLine.get(0).getId();
+				FileIO.write(LAST_HOME_TIMELINE_ID_PATH, lastHomeTimelineID.toString());
+				logger.log(Level.WARNING, "タイムラインの最新のツイートのIDをlastHomeTimelineIDとして設定し、アプリケーションを実行します。");
+			} else {
+				lastHomeTimelineID = homeTimeLine.get(0).getId();
+			}
+
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "lastReplyIDが設定できませんでした: " + e.getMessage());
+			logger.log(Level.SEVERE, "lastReplyID, lastHomeTimelineIDが設定できませんでした: " + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
 		}
+
 	}
 
 	/**
-	 * 自分のScreenNameを取得する API？
+	 * 自分のScreenNameを取得する<br>
+	 * API消費なし
 	 * 
-	 * @return
+	 * @return String
 	 * @throws TwitterException
 	 */
 	public String getMyScreenName() throws TwitterException {
@@ -234,6 +269,7 @@ public class TwitterAPI {
 	 * [GET statuses/home_timeline]APIを1消費する
 	 * 
 	 * @param count
+	 *            <= 200
 	 * @return ResponseList
 	 * @throws TwitterException
 	 */
@@ -241,6 +277,26 @@ public class TwitterAPI {
 		Paging paging = new Paging(1, count);
 		return twitter.getHomeTimeline(paging);
 	}
+	
+	/**
+	 * ホームタイムラインから最新count件を取得し、ResponseListに格納して返す<br>
+	 * このメソッドで取得した最新のツイートIDは保持され、再度タイムラインを取得する場合、前回からの更新分だけを返す
+	 * [GET statuses/home_timeline]APIを1消費する
+	 * 
+	 * @param count
+	 * @return ResponseList
+	 * @throws TwitterException
+	 */
+	public ResponseList<Status> getHomeTimelineMemory(int count) throws TwitterException {
+		Paging paging = new Paging(1, count, lastHomeTimelineID);
+		ResponseList<Status> homeTimeline = twitter.getHomeTimeline(paging);
+		// 本当にリストの最後が最新なんだっけ？
+		// TODO
+		lastHomeTimelineID = homeTimeline.get(homeTimeline.size() -1).getId();
+		return homeTimeline;
+	}
+	
+	
 
 	/**
 	 * つぶやきをpostします<br>

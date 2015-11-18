@@ -80,31 +80,33 @@ public class PeriodicTweetTimerTask extends TimerTask {
 				System.out.println(text);
 				textList.add(text);
 			}
-			// homeTimelineが取得できたら
-			if (textList.size() > 0) {
-				boolean success = false;
-				for (int i = 0; i < 10; i++) {
-					if (getMarkovText(textList)) {
-						success = true;
-						break;
-					}
-				}
-				if (!success) {
-					logger.info("markov: 文章作成に失敗したので今回はつぶやきません。");
-					return;
-				}
-
-				// 生成結果を受け取る
-				String result = MarkovGetterThread.getResult();
-				if (result.length() > TwitterAPI.TWEET_LENGTH_MAX - 3) {
-					result = result.substring(0, TwitterAPI.TWEET_LENGTH_MAX);
-					result += "文字数";
-				}
-				twitterAPI.postTweet(result);
-
-			} else {
+			// homeTimelineが取得できなかったら
+			if (textList.size() <= 0) {
 				logger.info("homeTimeline: 文章生成に適したツイートがなかったため今回はつぶやきません");
+				return;
 			}
+
+			boolean success = false;
+			for (int i = 0; i < 10; i++) {
+				if (getMarkovText(textList)) {
+					success = true;
+					break;
+				}
+			}
+			if (!success) {
+				logger.info("markov: 文章作成に失敗したので今回はつぶやきません。");
+				return;
+			}
+
+			// 生成結果を受け取る
+			String result = MarkovGetterThread.getResult();
+			
+			// 文字数が140文字を超える場合、zasshoku_botが伝えきれないことを表現します
+			if (result.length() > TwitterAPI.TWEET_LENGTH_MAX - 3) {
+				result = result.substring(0, TwitterAPI.TWEET_LENGTH_MAX);
+				result += "文字数";
+			}
+			twitterAPI.postTweet(result);
 
 		} catch (TwitterException e) {
 			if (e.isCausedByNetworkIssue()) {

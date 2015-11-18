@@ -45,7 +45,8 @@ public class BotFactory {
 		String ndfip = conf.getProperty("NotDestroyFriendshipIDsFile");
 		String ncfip = conf.getProperty("NotCreateFriendshipIDsFile");
 		String lrip = conf.getProperty("LastRepyIDFile");
-		return new TwitterAPI(twitter, ndfip, ncfip, lrip);
+		String lhip = conf.getProperty("LastHomeTimelineIDFile");
+		return new TwitterAPI(twitter, ndfip, ncfip, lrip, lhip);
 	}
 
 	/**
