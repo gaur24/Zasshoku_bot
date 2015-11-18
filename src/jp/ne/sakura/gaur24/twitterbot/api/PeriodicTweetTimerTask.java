@@ -7,6 +7,10 @@ import java.util.logging.Logger;
 
 import twitter4j.TwitterException;
 
+/**
+ * 定期的にツイートするタイマータスクのサンプル
+ *
+ */
 public class PeriodicTweetTimerTask extends TimerTask {
 
 	// Twitter API
@@ -31,6 +35,8 @@ public class PeriodicTweetTimerTask extends TimerTask {
 				logger.log(Level.WARNING, "exceededRateLimitation: API制限を超えました。");
 			} else if (e.getErrorCode() == 187) {
 				logger.log(Level.WARNING, "Status is a duplicate: 同じ文をツイートしようとしました。");
+			} else if (e.getErrorCode() == 186) {
+				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
 				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
 			}

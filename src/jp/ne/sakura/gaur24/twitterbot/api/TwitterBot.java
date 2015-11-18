@@ -2,15 +2,24 @@ package jp.ne.sakura.gaur24.twitterbot.api;
 
 import java.util.Timer;
 
+/**
+ * botの本体<br>
+ * 各種タイマータスクを生成、スケジュールする
+ *
+ */
 public class TwitterBot {
 
 	private TwitterAPI twitterAPI;
 	private Timer timer;
+	
+	private static long ONE_MINUTE = 60 * 1000;
+	
 	private boolean doPeriodicPost = true;
 	private boolean doPeriodicReply = false;
 	private boolean doPeriodicFollowCheck = false;
-
-	private static long ONE_MINUTE = 60 * 1000;
+	
+	// タイマータスクを呼び出す時間間隔を設定
+	// TODO プロパティファイルで設定可能に
 	private long postPeriod = 10 * ONE_MINUTE;
 	private long replyPeriod = 5 * ONE_MINUTE;
 	private long followCheckPeriod = 12 * 60 * ONE_MINUTE;

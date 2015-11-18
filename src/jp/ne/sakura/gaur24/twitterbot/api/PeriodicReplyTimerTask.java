@@ -9,7 +9,7 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 /**
- * リプライを行うタイマータスク
+ * リプライを行うタイマータスクのサンプル
  */
 public class PeriodicReplyTimerTask extends TimerTask {
 	// Twitter API
@@ -39,17 +39,18 @@ public class PeriodicReplyTimerTask extends TimerTask {
 
 		} catch (TwitterException e) {
 			if (e.isCausedByNetworkIssue()) {
-				logger.log(Level.WARNING, "isCausedByNetworkIssue: ネットワークに問題があります。再度リプライを試みます。");
+				logger.log(Level.WARNING, "isCausedByNetworkIssue: ネットワークに問題があります。");
 			} else if (e.exceededRateLimitation()) {
 				logger.log(Level.WARNING, "exceededRateLimitation: API制限を超えました。");
 			} else if (e.getErrorCode() == 187) {
-				logger.log(Level.WARNING, "Status is a duplicate: 同じ文をツイートしようとしました。スタンプを付加して再度リプライします。");
-				isDuplicate = true;
+				logger.log(Level.WARNING, "Status is a duplicate: 同じ文をツイートしようとしました。");
+			} else if (e.getErrorCode() == 186) {
+				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
-				logger.log(Level.SEVERE, "想定外のエラーが発生しています。再度リプライを試みます。" + e.getMessage());
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "想定外のエラーが発生しています。再度リプライを試みます。" + e.getMessage());
+			logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
 		}
 
 	}
