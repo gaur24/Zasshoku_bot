@@ -2,6 +2,8 @@
 適当な言葉を喋るだけ
 
 # HOW TO USE
+* Twitter4jとlucene-gosenのライブラリを使用しています。
+  
 * token.propertiesにトークンを記入します。それだけでとりあえず動きます。
 * conf.propertiesに各種データを保持、設定するファイル名を書きます。通常はデフォルトのままでOK。
 * notCreateFriendshipIDs.datに自動でフォローしないユーザーのIDを記入します。
