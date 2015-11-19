@@ -40,7 +40,7 @@ public class PeriodicPiggybackingRetweetTimerTask extends TimerTask {
 				}
 				// リツイートされた数が5より多いなら
 				if(homeTimeline.get(i).getRetweetCount() > 5){
-					twitterAPI.retweetStatus(homeTimeline.get(i).getId());
+					twitterAPI.retweetStatus(homeTimeline.get(i));
 				}
 				
 			}

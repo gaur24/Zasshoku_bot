@@ -29,7 +29,7 @@ public class TwitterAPI {
 	 * Twitterでつぶやける最大文字数
 	 */
 	public static final int TWEET_LENGTH_MAX = 140;
-	
+
 	/**
 	 * 自分のScreenName
 	 */
@@ -132,7 +132,8 @@ public class TwitterAPI {
 				FileIO.write(LAST_HOME_TIMELINE_ID_PATH, lastHomeTimelineID.toString());
 				logger.log(Level.WARNING, "タイムラインの最新のツイートのIDをlastHomeTimelineIDとして設定し、アプリケーションを実行します。");
 			} else {
-				lastHomeTimelineID = lastHomeTimelineIDList.stream().map(Long::valueOf).collect(Collectors.toList()).get(0);
+				lastHomeTimelineID = lastHomeTimelineIDList.stream().map(Long::valueOf).collect(Collectors.toList())
+						.get(0);
 			}
 
 		} catch (Exception e) {
@@ -140,10 +141,10 @@ public class TwitterAPI {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		
+
 		try {
 			MY_SCREEN_NAME = twitter.getScreenName();
-		} catch(Exception e){
+		} catch (Exception e) {
 			logger.log(Level.SEVERE, "Twitterと接続できませんでした。" + e.getMessage());
 			e.printStackTrace();
 			System.exit(1);
@@ -279,11 +280,11 @@ public class TwitterAPI {
 		Paging paging = new Paging(1, count);
 		return twitter.getHomeTimeline(paging);
 	}
-	
+
 	/**
 	 * ホームタイムラインから最新count件を取得し、ResponseListに格納して返す<br>
-	 * このメソッドで取得した最新のツイートIDは保持され、再度タイムラインを取得する場合、前回からの更新分だけを返す
-	 * [GET statuses/home_timeline]APIを1消費する
+	 * このメソッドで取得した最新のツイートIDは保持され、再度タイムラインを取得する場合、前回からの更新分だけを返す [GET
+	 * statuses/home_timeline]APIを1消費する
 	 * 
 	 * @param count
 	 * @return ResponseList
@@ -294,11 +295,9 @@ public class TwitterAPI {
 		ResponseList<Status> homeTimeline = twitter.getHomeTimeline(paging);
 		// 本当にリストの最後が最新なんだっけ？
 		// TODO
-		lastHomeTimelineID = homeTimeline.get(homeTimeline.size() -1).getId();
+		lastHomeTimelineID = homeTimeline.get(homeTimeline.size() - 1).getId();
 		return homeTimeline;
 	}
-	
-	
 
 	/**
 	 * つぶやきをpostします<br>
@@ -365,16 +364,17 @@ public class TwitterAPI {
 			FileIO.write(LAST_REPLY_ID_PATH, lastReplyID.toString());
 		}
 	}
-	
+
 	/**
-	 * ツイートをリツイートします
+	 * ツイートをリツイートします<br>
 	 * [POST statuses/retweet/:id]APIに制限はないが、1ユーザー当たりの投稿数の制限はある
 	 * 
-	 * @param statusID
+	 * @param status
 	 * @throws TwitterException
 	 */
-	public void retweetStatus(long statusID) throws TwitterException {
-		twitter.retweetStatus(statusID);
+	public void retweetStatus(Status status) throws TwitterException {
+		twitter.retweetStatus(status.getId());
+		logger.log(Level.FINE, "【RT】" + status.getText());
 	}
 
 }
