@@ -1,6 +1,5 @@
 package jp.ne.sakura.gaur24.twitterbot.api;
 
-import java.util.Calendar;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -8,13 +7,12 @@ import java.util.logging.Logger;
 import twitter4j.TwitterException;
 
 /**
- * 定期的にツイートするタイマータスクのサンプル
- *
+ * 定期的にツイートするタイマータスク
  */
-public class PeriodicTweetTimerTask extends TimerTask {
+public abstract class PeriodicTweetTimerTask extends TimerTask {
 
 	// Twitter API
-	private TwitterAPI twitterAPI;
+	protected TwitterAPI twitterAPI;
 
 	// ロガー
 	private static final Logger logger = Logger.getLogger(PeriodicTweetTimerTask.class.getName());
@@ -22,12 +20,26 @@ public class PeriodicTweetTimerTask extends TimerTask {
 	public PeriodicTweetTimerTask(TwitterAPI twitterAPI) {
 		this.twitterAPI = twitterAPI;
 	}
+	
+	/**
+	 * このメソッドを実装し、定期的につぶやく文章を作成してください<br>
+	 * なんらかの例外が発生した場合、ログを残します
+	 * 
+	 * @return String
+	 * @throws TwitterException
+	 */
+	abstract public String makeTweet() throws TwitterException;
 
 	@Override
 	public void run() {
-		Calendar cal = Calendar.getInstance();
 		try {
-			twitterAPI.postTweet("今" + cal.get(Calendar.HOUR_OF_DAY) + ":" + cal.get(Calendar.MINUTE) + "だよ");
+			String tweet = makeTweet();
+			if(tweet == null || tweet.isEmpty()){
+				logger.log(Level.WARNING, "つぶやきが正しく生成されていません。");
+				return;
+			}
+			twitterAPI.postTweet(tweet);
+			
 		} catch (TwitterException e) {
 			if (e.isCausedByNetworkIssue()) {
 				logger.log(Level.WARNING, "isCausedByNetworkIssue: ネットワークに問題があります。");

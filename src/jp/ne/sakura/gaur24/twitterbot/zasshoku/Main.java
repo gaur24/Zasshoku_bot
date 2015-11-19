@@ -2,7 +2,6 @@ package jp.ne.sakura.gaur24.twitterbot.zasshoku;
 
 import jp.ne.sakura.gaur24.twitterbot.api.BotFactory;
 import jp.ne.sakura.gaur24.twitterbot.api.TwitterAPI;
-import jp.ne.sakura.gaur24.twitterbot.api.TwitterBot;
 import twitter4j.Twitter;
 
 public class Main {

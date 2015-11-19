@@ -9,11 +9,12 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 /**
- * リプライを行うタイマータスクのサンプル
+ * リプライを行うタイマータスク
  */
-public class PeriodicReplyTimerTask extends TimerTask {
+abstract public class PeriodicReplyTimerTask extends TimerTask {
+	
 	// Twitter API
-	private TwitterAPI twitterAPI;
+	protected TwitterAPI twitterAPI;
 
 	// ロガー
 	private static final Logger logger = Logger.getLogger(PeriodicReplyTimerTask.class.getName());
@@ -24,6 +25,17 @@ public class PeriodicReplyTimerTask extends TimerTask {
 	public PeriodicReplyTimerTask(TwitterAPI twitterAPI) {
 		this.twitterAPI = twitterAPI;
 	}
+	
+	/**
+	 * このメソッドを実装し、リプライする文章を作成してください<br>
+	 * このメソッドの返り値に"@ユーザー名 "を含める必要はなく、自動で付加します<br>
+	 * なんらかの例外が発生した場合、ログを残します<br>
+	 * 
+	 * @param replyStatus
+	 * @return String
+	 * @throws TwitterException
+	 */
+	abstract public String makeReply(Status replyStatus) throws TwitterException;
 
 	@Override
 	public void run() {
@@ -32,7 +44,7 @@ public class PeriodicReplyTimerTask extends TimerTask {
 
 			// 古いツイートから新しいツイートに向かって走査
 			for (int i = mentions.size() - 1; i >= 0; i--) {
-				String reply = "@" + mentions.get(i).getUser().getScreenName() + " " + "どもこん";
+				String reply = "@" + mentions.get(i).getUser().getScreenName() + " " + makeReply(mentions.get(i));
 				twitterAPI.postReply(reply, mentions.get(i).getId(), isDuplicate);
 				isDuplicate = false;
 			}
