@@ -32,7 +32,7 @@ public class TwitterBot {
 		timer = new Timer();
 
 		if (doPeriodicPost) {
-			timer.schedule(new PeriodicTweetTimerTask(twitterAPI), 0, postPeriod);
+			timer.schedule(new jp.ne.sakura.gaur24.twitterbot.zasshoku.PeriodicTweetTimerTask(twitterAPI), 0, postPeriod);
 		}
 
 		if (doPeriodicReply) {

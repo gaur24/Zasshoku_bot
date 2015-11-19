@@ -29,6 +29,11 @@ public class TwitterAPI {
 	 * Twitterでつぶやける最大文字数
 	 */
 	public static final int TWEET_LENGTH_MAX = 140;
+	
+	/**
+	 * 自分のScreenName
+	 */
+	public static String MY_SCREEN_NAME = null;
 
 	// ファイルのパスを保持
 	private final Path NOT_DESTROY_FRIENDSHIP_IDS_PATH;
@@ -127,7 +132,7 @@ public class TwitterAPI {
 				FileIO.write(LAST_HOME_TIMELINE_ID_PATH, lastHomeTimelineID.toString());
 				logger.log(Level.WARNING, "タイムラインの最新のツイートのIDをlastHomeTimelineIDとして設定し、アプリケーションを実行します。");
 			} else {
-				lastHomeTimelineID = homeTimeLine.get(0).getId();
+				lastHomeTimelineID = lastHomeTimelineIDList.stream().map(Long::valueOf).collect(Collectors.toList()).get(0);
 			}
 
 		} catch (Exception e) {
@@ -135,18 +140,15 @@ public class TwitterAPI {
 			e.printStackTrace();
 			System.exit(1);
 		}
+		
+		try {
+			MY_SCREEN_NAME = twitter.getScreenName();
+		} catch(Exception e){
+			logger.log(Level.SEVERE, "Twitterと接続できませんでした。" + e.getMessage());
+			e.printStackTrace();
+			System.exit(1);
+		}
 
-	}
-
-	/**
-	 * 自分のScreenNameを取得する<br>
-	 * API消費なし
-	 * 
-	 * @return String
-	 * @throws TwitterException
-	 */
-	public String getMyScreenName() throws TwitterException {
-		return twitter.getScreenName();
 	}
 
 	/**
