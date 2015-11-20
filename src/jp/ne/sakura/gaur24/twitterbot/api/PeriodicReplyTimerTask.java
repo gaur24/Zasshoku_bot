@@ -62,6 +62,7 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 				logger.log(Level.WARNING, "exceededRateLimitation: API制限を超えました。");
 			} else if (e.getErrorCode() == 187) {
 				logger.log(Level.WARNING, "Status is a duplicate: 同じ文をツイートしようとしました。");
+				isDuplicate = true;
 			} else if (e.getErrorCode() == 186) {
 				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
