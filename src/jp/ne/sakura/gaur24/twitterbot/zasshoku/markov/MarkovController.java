@@ -53,7 +53,7 @@ public class MarkovController {
 
 			// TODO
 			// デバッグ用。あとで消す
-			System.out.println(text);
+//			System.out.println(text);
 			textList.add(text);
 			
 		}

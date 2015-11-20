@@ -29,6 +29,7 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 	/**
 	 * このメソッドを実装し、リプライする文章を作成してください<br>
 	 * このメソッドの返り値に"@ユーザー名 "を含める必要はなく、自動で付加します<br>
+	 * 返事をしない場合は、nullを返してください<br>
 	 * なんらかの例外が発生した場合、ログを残します<br>
 	 * 
 	 * @param replyStatus
@@ -44,7 +45,12 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 
 			// 古いツイートから新しいツイートに向かって走査
 			for (int i = mentions.size() - 1; i >= 0; i--) {
-				String reply = "@" + mentions.get(i).getUser().getScreenName() + " " + makeReply(mentions.get(i));
+				String makedReply = makeReply(mentions.get(i));
+				// nullの場合は返事しない
+				if(makedReply == null){
+					continue;
+				}
+				String reply = "@" + mentions.get(i).getUser().getScreenName() + " " + makedReply;
 				twitterAPI.postReply(reply, mentions.get(i).getId(), isDuplicate);
 				isDuplicate = false;
 			}
