@@ -25,8 +25,6 @@ public class ZasshokuTweet extends PeriodicTweetTimerTask {
 		String tweet = MarkovController.getText(homeTimeline);
 
 		// 文字数が140文字を超える場合、zasshoku_botが伝えきれないことを表現します
-		// TODO
-		// 文字数の調節がうまくいってないので要修正
 		if (tweet.length() > TwitterAPI.TWEET_LENGTH_MAX - 3) {
 			tweet = tweet.substring(0, TwitterAPI.TWEET_LENGTH_MAX - 3);
 			tweet += "文字数";

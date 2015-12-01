@@ -354,7 +354,7 @@ public class TwitterAPI {
 			int stampNum = rd.nextInt(100);
 			reply = reply + "" + stampNum;
 		}
-		if (reply.length() >= TWEET_LENGTH_MAX) {
+		if (reply.length() > TWEET_LENGTH_MAX) {
 			// ScreenNameが長い人等に返事できない場合があり、繰り返しリプライを失敗する状態を避けるため、リプライを諦める
 			logger.log(Level.WARNING, "リプライ文が" + TWEET_LENGTH_MAX + "文字を超えています。返事をしません。");
 		} else {

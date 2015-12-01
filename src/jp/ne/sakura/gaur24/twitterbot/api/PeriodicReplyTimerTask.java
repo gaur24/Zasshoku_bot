@@ -38,7 +38,7 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 
 		// TODO
 		// プロパティから値をとってきたいけど、とりあえず。
-		int replyCountLimit = 1;
+		int replyCountLimit = 3;
 		// 1より小さい値に設定した場合、実質上限なしとして扱う
 		if (replyCountLimit < 1) {
 			REPLY_COUNT_LIMIT = Integer.MAX_VALUE;
@@ -57,9 +57,7 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 	 * @return String
 	 * @throws TwitterException
 	 */
-	abstract public String makeReply(Status replyStatus) throws TwitterException;
-	// TODO
-	// protectedでは
+	abstract protected String createReply(Status replyStatus) throws TwitterException;
 
 	@Override
 	public void run() {
@@ -100,22 +98,22 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 				// 返事回数の上限までなら返事をする
 				if (count < REPLY_COUNT_LIMIT) {
 
-					String makedReply = makeReply(mention);
+					String createdReply = createReply(mention);
 
 					// nullの場合は返事しない
-					if (makedReply == null) {
+					if (createdReply == null) {
 						twitterAPI.doNotReplyToThisTweet(mention.getId());
 
 						// removeするのは全部のリプライをチェックしてから
 						removeUserIDSet.add(mention.getUser().getId());
 						continue;
 					}
-					String reply = "@" + mention.getUser().getScreenName() + " " + makedReply;
+					String reply = "@" + mention.getUser().getScreenName() + " " + createdReply;
 					twitterAPI.postReply(reply, mention.getId(), isDuplicate);
 					isDuplicate = false;
 
 					// リプライチェック時に取得した複数のリプライの中に、同じユーザーからのリプライが複数含まれる場合、
-					// 前回makeReplyがnullだったとしても今回返事が出来る場合がある
+					// 前回createReply()がnullだったとしても今回返事が出来る場合がある
 					removeUserIDSet.remove(mention.getUser().getId());
 
 					// リプライを返したユーザーを保持しておく

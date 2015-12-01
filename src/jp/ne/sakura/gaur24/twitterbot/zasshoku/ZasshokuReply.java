@@ -13,7 +13,7 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 	}
 
 	@Override
-	public String makeReply(Status replyStatus) throws TwitterException {
+	public String createReply(Status replyStatus) throws TwitterException {
 		
 		String screenName = replyStatus.getUser().getScreenName();
 		
@@ -32,8 +32,6 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 
 		// 文字数が140文字を超える場合、zasshoku_botが伝えきれないことを表現します
 		// [@screenName reply]
-		// TODO
-		// 文字数の調節がうまくいってないので要修正
 		if (reply.length() > TwitterAPI.TWEET_LENGTH_MAX - 3 - screenName.length() - 2) {
 			reply = reply.substring(0, TwitterAPI.TWEET_LENGTH_MAX - 3 - screenName.length() - 2);
 			reply += "文字数";
