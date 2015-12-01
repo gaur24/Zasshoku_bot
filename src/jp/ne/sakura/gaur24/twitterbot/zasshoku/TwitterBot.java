@@ -15,7 +15,7 @@ public class TwitterBot {
 	
 	private static long ONE_MINUTE = 60 * 1000;
 	
-	private boolean doPeriodicPost = true;
+	private boolean doPeriodicPost = false;
 	private boolean doPeriodicReply = true;
 	private boolean doPeriodicFollowCheck = false;
 	private boolean doPeriodicRetweet = false;
@@ -23,7 +23,7 @@ public class TwitterBot {
 	// タイマータスクを呼び出す時間間隔を設定
 	// TODO プロパティファイルで設定可能に
 	private long postPeriod = 1 * 60 * ONE_MINUTE;
-	private long replyPeriod = 5 * ONE_MINUTE;
+	private long replyPeriod = 2 * ONE_MINUTE;
 	private long followCheckPeriod = 12 * 60 * ONE_MINUTE;
 	private long retweetPeriod = 1 * 60 * ONE_MINUTE;
 

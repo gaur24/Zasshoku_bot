@@ -295,7 +295,14 @@ public class TwitterAPI {
 		ResponseList<Status> homeTimeline = twitter.getHomeTimeline(paging);
 		// 本当にリストの最後が最新なんだっけ？
 		// TODO
-		lastHomeTimelineID = homeTimeline.get(homeTimeline.size() - 1).getId();
+		Long lhtid = homeTimeline.get(homeTimeline.size() - 1).getId();
+		if(lastHomeTimelineID < lhtid){
+			lastHomeTimelineID = lhtid;
+			FileIO.write(LAST_HOME_TIMELINE_ID_PATH, lastHomeTimelineID.toString());
+		} else {
+			// ロジックが確認できたらelseを消します
+			System.out.println("getHomeTimelineMemory : ここが呼ばれるとするとロジックがおかしいので確認しないといけませんねぇ");
+		}
 		return homeTimeline;
 	}
 
@@ -358,11 +365,35 @@ public class TwitterAPI {
 			twitter.updateStatus(su);
 			logger.log(Level.FINE, "【reply】" + reply);
 		}
-		// リプライを返したツイートのIDを更新し、ファイルに書き込む
-		if (lastReplyID < inReplyToStatusId) {
-			lastReplyID = inReplyToStatusId;
-			FileIO.write(LAST_REPLY_ID_PATH, lastReplyID.toString());
+
+		updateLastReplyID(inReplyToStatusId);
+
+	}
+	
+	/**
+	 * 返事をしないリプライを通知します<br>
+	 * 通知しない場合、getMentions()した時に再び取得されます
+	 * 
+	 * @param statusID
+	 */
+	public void doNotReplyToThisTweet(long statusID){
+		// 内部的にはlastReplyIDを更新するだけ
+		updateLastReplyID(statusID);
+	}
+	
+	/**
+	 * lastReplyIDを更新する<br>
+	 * ファイル更新も同時に行う
+	 * 
+	 * @param statusID
+	 */
+	private void updateLastReplyID(long statusID){
+		// 値が古ければ更新しない
+		if(lastReplyID >= statusID){
+			return;
 		}
+		lastReplyID = statusID;
+		FileIO.write(LAST_REPLY_ID_PATH, lastReplyID.toString());
 	}
 
 	/**
