@@ -1,6 +1,7 @@
 package jp.ne.sakura.gaur24.twitterbot.zasshoku;
 
 import java.util.Timer;
+import java.util.concurrent.TimeUnit;
 
 import jp.ne.sakura.gaur24.twitterbot.api.PeriodicFollowCheckTimerTask;
 import jp.ne.sakura.gaur24.twitterbot.api.TwitterAPI;
@@ -12,20 +13,18 @@ import jp.ne.sakura.gaur24.twitterbot.api.TwitterAPI;
 public class TwitterBot {
 	private TwitterAPI twitterAPI;
 	private Timer timer;
-	
-	private static long ONE_MINUTE = 60 * 1000;
-	
-	private boolean doPeriodicPost = false;
+
+	private boolean doPeriodicPost = true;
 	private boolean doPeriodicReply = true;
 	private boolean doPeriodicFollowCheck = false;
 	private boolean doPeriodicRetweet = false;
-	
+
 	// タイマータスクを呼び出す時間間隔を設定
 	// TODO プロパティファイルで設定可能に
-	private long postPeriod = 1 * 60 * ONE_MINUTE;
-	private long replyPeriod = 2 * ONE_MINUTE;
-	private long followCheckPeriod = 12 * 60 * ONE_MINUTE;
-	private long retweetPeriod = 1 * 60 * ONE_MINUTE;
+	private long postPeriod = TimeUnit.HOURS.toMillis(1L);
+	private long replyPeriod = TimeUnit.MINUTES.toMillis(3L);
+	private long followCheckPeriod = TimeUnit.HOURS.toMillis(12L);
+	private long retweetPeriod = TimeUnit.HOURS.toMillis(1L);
 
 	public TwitterBot(TwitterAPI twitterAPI) {
 		this.twitterAPI = twitterAPI;
