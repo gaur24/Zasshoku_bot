@@ -22,11 +22,6 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 			return null;
 		}
 		
-		// TODO
-		// 連続で同じ人から5回くらいリプライがきたら返事をせずに会話を途切れさせる機能
-		// bot同士の喧嘩防止
-		// オンメモリで
-		
 		// Markov連鎖により文章を構成させ、生成結果を受け取る
 		String reply = MarkovController.getText(twitterAPI.getHomeTimeline(200));
 
@@ -38,5 +33,14 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 		}
 		return reply;
 	}
+
+	@Override
+	protected void postProcessingOfSuccess(Status mention) throws TwitterException {
+		// TODO
+		// 経験値を取得する処理
+		
+	}
+
+
 
 }

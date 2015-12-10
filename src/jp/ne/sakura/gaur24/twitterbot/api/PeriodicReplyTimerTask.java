@@ -59,6 +59,16 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 	 */
 	abstract protected String createReply(Status replyStatus) throws TwitterException;
 
+	/**
+	 * このメソッドを実装し、つぶやきが成功したあとに実行する処理を記述してください<br>
+	 * このメソッドは、createReply()によりリプライ文を生成し、つぶやきを実行した直後に呼ばれます<br>
+	 * なんらかの例外が発生した場合、ログを残します
+	 * 
+	 * @param mention
+	 * @throws TwitterException
+	 */
+	abstract protected void postProcessingOfSuccess(Status mention) throws TwitterException;
+
 	@Override
 	public void run() {
 
@@ -110,6 +120,10 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 					}
 					String reply = "@" + mention.getUser().getScreenName() + " " + createdReply;
 					twitterAPI.postReply(reply, mention.getId(), isDuplicate);
+					
+					// つぶやきに成功するたびに呼ぶ
+					postProcessingOfSuccess(mention);
+					
 					isDuplicate = false;
 
 					// リプライチェック時に取得した複数のリプライの中に、同じユーザーからのリプライが複数含まれる場合、
