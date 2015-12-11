@@ -1,5 +1,9 @@
 package jp.ne.sakura.gaur24.twitterbot.zasshoku;
 
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import jp.ne.sakura.gaur24.twitterbot.api.PeriodicReplyTimerTask;
 import jp.ne.sakura.gaur24.twitterbot.api.TwitterAPI;
 import jp.ne.sakura.gaur24.twitterbot.zasshoku.markov.MarkovController;
@@ -7,9 +11,15 @@ import twitter4j.Status;
 import twitter4j.TwitterException;
 
 public class ZasshokuReply extends PeriodicReplyTimerTask {
+	
+	// ロガー
+	private static final Logger logger = Logger.getLogger(ZasshokuReply.class.getName());
+	
+	private List<ZasshokuUser> zasshokuUsers;
 
-	public ZasshokuReply(TwitterAPI twitterAPI) {
+	public ZasshokuReply(TwitterAPI twitterAPI, List<ZasshokuUser> zasshokuUsers) {
 		super(twitterAPI);
+		this.zasshokuUsers = zasshokuUsers;
 	}
 
 	@Override
@@ -37,7 +47,21 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 	@Override
 	protected void postProcessingOfSuccess(Status mention) throws TwitterException {
 		// TODO
-		// 経験値を取得する処理
+		// ユーザー情報を永続化
+		
+		for(ZasshokuUser user : zasshokuUsers){
+			if(user.getUserID() != mention.getUser().getId()){
+				continue;
+			}
+			user.gainExp(1);
+			logger.log(Level.FINE, "ユーザー @" + user.getScreenName() + "に経験値を1付与しました");
+			return;
+		}
+		ZasshokuUser newUser = new ZasshokuUser(mention.getUser().getId(), mention.getUser().getScreenName());
+		newUser.gainExp(1);
+		zasshokuUsers.add(newUser);
+		logger.log(Level.FINE, "ユーザー @" + newUser.getScreenName() + "を追加しました");
+		System.out.println(newUser.toString());
 		
 	}
 

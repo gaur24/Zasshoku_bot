@@ -1,5 +1,6 @@
 package jp.ne.sakura.gaur24.twitterbot.zasshoku;
 
+import java.util.ArrayList;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
@@ -38,7 +39,7 @@ public class TwitterBot {
 		}
 
 		if (doPeriodicReply) {
-			timer.schedule(new ZasshokuReply(twitterAPI), 0, replyPeriod);
+			timer.schedule(new ZasshokuReply(twitterAPI, new ArrayList<ZasshokuUser>()), 0, replyPeriod);
 		}
 
 		if (doPeriodicFollowCheck) {

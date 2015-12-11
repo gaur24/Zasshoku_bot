@@ -151,5 +151,13 @@ public class ZasshokuUser {
 	public int getLevel() {
 		return level;
 	}
+	
+	/**
+	 * ファイル出力用にユーザー情報を出力
+	 */
+	@Override
+	public String toString() {
+		return screenName + "," + totalExp;
+	}
 
 }
