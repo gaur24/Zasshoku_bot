@@ -17,7 +17,7 @@ public class BotFactory {
 	 * @param tokenPropertyFile
 	 * @return Twitter
 	 */
-	public Twitter getTwitterInstance(String tokenPropertyFile) {
+	private Twitter getTwitterInstance(String tokenPropertyFile) {
 		Properties token = FileIO.readProperty(tokenPropertyFile);
 
 		// プロパティファイルから取得したトークンを用いて認証処理
@@ -40,7 +40,10 @@ public class BotFactory {
 	 * @param confPropertyFile
 	 * @return
 	 */
-	public TwitterAPI getTwitterAPIInstance(Twitter twitter, String confPropertyFile) {
+	public TwitterAPI getTwitterAPIInstance(String tokenPropertyFile, String confPropertyFile) {
+		
+		Twitter twitter = getTwitterInstance(tokenPropertyFile);
+
 		Properties conf = FileIO.readProperty(confPropertyFile);
 		String ndfip = conf.getProperty("NotDestroyFriendshipIDsFile");
 		String ncfip = conf.getProperty("NotCreateFriendshipIDsFile");

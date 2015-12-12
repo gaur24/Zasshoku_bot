@@ -54,7 +54,7 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 				continue;
 			}
 			user.gainExp(1);
-			logger.log(Level.FINE, "ユーザー @" + user.getScreenName() + "に経験値を1付与しました");
+			logger.log(Level.FINE, "ユーザー @" + user.getScreenName() + "に経験値を付与しました");
 			return;
 		}
 		ZasshokuUser newUser = new ZasshokuUser(mention.getUser().getId(), mention.getUser().getScreenName());

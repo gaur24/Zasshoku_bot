@@ -157,7 +157,7 @@ public class ZasshokuUser {
 	 */
 	@Override
 	public String toString() {
-		return screenName + "," + totalExp;
+		return screenName + "," + level + "," + totalExp;
 	}
 
 }

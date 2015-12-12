@@ -164,9 +164,11 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
 				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+				e.printStackTrace();
 			}
 		} catch (Exception e) {
 			logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+			e.printStackTrace();
 		} finally {
 			// リプライを返している途中で例外が発生したら、それまでの分の情報でreplyCountMapを更新する
 
