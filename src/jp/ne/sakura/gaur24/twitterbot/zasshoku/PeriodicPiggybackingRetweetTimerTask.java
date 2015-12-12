@@ -19,9 +19,12 @@ public class PeriodicPiggybackingRetweetTimerTask extends TimerTask {
 
 	// ロガー
 	private static final Logger logger = Logger.getLogger(PeriodicPiggybackingRetweetTimerTask.class.getName());
+	
+	private final int PIGGYBACKING_RETWEET_COUNT;
 
-	public PeriodicPiggybackingRetweetTimerTask(TwitterAPI twitterAPI) {
+	public PeriodicPiggybackingRetweetTimerTask(TwitterAPI twitterAPI, int piggybackingRetweetCount) {
 		this.twitterAPI = twitterAPI;
+		PIGGYBACKING_RETWEET_COUNT = piggybackingRetweetCount;
 	}
 
 	@Override
@@ -39,7 +42,7 @@ public class PeriodicPiggybackingRetweetTimerTask extends TimerTask {
 					continue;
 				}
 				// リツイートされた数が5より多いなら
-				if(homeTimeline.get(i).getRetweetCount() > 5){
+				if(homeTimeline.get(i).getRetweetCount() > PIGGYBACKING_RETWEET_COUNT){
 					twitterAPI.retweetStatus(homeTimeline.get(i));
 				}
 				
@@ -50,15 +53,11 @@ public class PeriodicPiggybackingRetweetTimerTask extends TimerTask {
 				logger.log(Level.WARNING, "isCausedByNetworkIssue: ネットワークに問題があります。");
 			} else if (e.exceededRateLimitation()) {
 				logger.log(Level.WARNING, "exceededRateLimitation: API制限を超えました。");
-			} else if (e.getErrorCode() == 187) {
-				logger.log(Level.WARNING, "Status is a duplicate: 同じ文をツイートしようとしました。");
-			} else if (e.getErrorCode() == 186) {
-				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
-				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+			logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 		}
 
 	}

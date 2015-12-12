@@ -68,8 +68,9 @@ public class ZasshokuBot {
 			}
 			if (isRetweet) {
 				long piggybackingRetweetPeriod = TimeUnit.MINUTES
-						.toMillis(Long.parseLong(zasshokuP.getProperty("PiggyBackingRetweetPeriod")));
-				timer.schedule(new PeriodicPiggybackingRetweetTimerTask(twitterAPI), delay, piggybackingRetweetPeriod);
+						.toMillis(Long.parseLong(zasshokuP.getProperty("PiggybackingRetweetPeriod")));
+				int piggybackingRetweetCount = Integer.parseInt(zasshokuP.getProperty("PiggybackingRetweetCount"));
+				timer.schedule(new PeriodicPiggybackingRetweetTimerTask(twitterAPI, piggybackingRetweetCount), delay, piggybackingRetweetPeriod);
 			}
 		} catch (Exception e) {
 			System.err.println("zasshoku.propertiesまたはZasshokuUsers.datに不正な記述があります");
