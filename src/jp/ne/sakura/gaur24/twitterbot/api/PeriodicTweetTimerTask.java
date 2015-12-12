@@ -50,10 +50,16 @@ public abstract class PeriodicTweetTimerTask extends TimerTask {
 			} else if (e.getErrorCode() == 186) {
 				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
-				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
+			}
+		} catch (IllegalArgumentException e){
+			if(e.getMessage().contains("count should be positive integer")){
+				logger.log(Level.SEVERE, "countの値は(1 <= count <= 200)としてください。", e);
+			} else {
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
+			logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 		}
 
 	}

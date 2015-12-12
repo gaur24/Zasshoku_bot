@@ -33,12 +33,9 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 	// ユーザーIDと連続リプライ回数を保持する
 	private Map<Long, Integer> replyCountMap = new HashMap<Long, Integer>();
 
-	public PeriodicReplyTimerTask(TwitterAPI twitterAPI) {
+	public PeriodicReplyTimerTask(TwitterAPI twitterAPI, int replyCountLimit) {
 		this.twitterAPI = twitterAPI;
 
-		// TODO
-		// プロパティから値をとってきたいけど、とりあえず。
-		int replyCountLimit = 3;
 		// 1より小さい値に設定した場合、実質上限なしとして扱う
 		if (replyCountLimit < 1) {
 			REPLY_COUNT_LIMIT = Integer.MAX_VALUE;
@@ -101,10 +98,6 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 					count = 0;
 				}
 
-				// TODO
-				// debug
-				System.out.println("count: " + count);
-
 				// 返事回数の上限までなら返事をする
 				if (count < REPLY_COUNT_LIMIT) {
 
@@ -163,12 +156,16 @@ abstract public class PeriodicReplyTimerTask extends TimerTask {
 			} else if (e.getErrorCode() == 186) {
 				logger.log(Level.WARNING, "Status is over 140 characters: ツイートが140文字を超えています。");
 			} else {
-				logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
-				e.printStackTrace();
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
+			}
+		} catch (IllegalArgumentException e){
+			if(e.getMessage().contains("count should be positive integer")){
+				logger.log(Level.SEVERE, "countの値は(1 <= count <= 200)としてください。", e);
+			} else {
+				logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 			}
 		} catch (Exception e) {
-			logger.log(Level.SEVERE, "想定外のエラーが発生しています。" + e.getMessage());
-			e.printStackTrace();
+			logger.log(Level.SEVERE, "想定外のエラーが発生しています。", e);
 		} finally {
 			// リプライを返している途中で例外が発生したら、それまでの分の情報でreplyCountMapを更新する
 

@@ -23,44 +23,58 @@ public class ZasshokuBot {
 
 		Properties zasshokuP = FileIO.readProperty(zasshokuProperties);
 
-		long delay = 5 * 1000L;
+		boolean isTweet = zasshokuP.getProperty("ZasshokuTweet", "").equals("true");
+		boolean isReply = zasshokuP.getProperty("ZasshokuReply", "").equals("true");
+		boolean isFollowCheck = zasshokuP.getProperty("FollowCheck", "").equals("true");
+		boolean isRetweet = zasshokuP.getProperty("PiggybackingRetweet", "").equals("true");
+		
+		int zassyokuRatio = Integer.parseInt(zasshokuP.getProperty("ZassyokuRatio"));
+		long zassyokuID = Long.parseLong(zasshokuP.getProperty("ZassyokuID"));
 
+		// 5秒待って開始
+		long delay = TimeUnit.SECONDS.toMillis(5);
+		
 		// TimerTaskを設定
 		// timer.schedule(TimerTask task, long delay, long period);
 		// delay[ms]後にタスクを開始<br>
 		// タスク開始後はperiod[ms]毎にタスクを実行します
-		if (zasshokuP.getProperty("ZasshokuTweet") != null && zasshokuP.getProperty("ZasshokuTweet").equals("true")) {
-			long tweetPeriod = TimeUnit.MINUTES.toMillis(Long.parseLong(zasshokuP.getProperty("ZasshokuTweetPeriod")));
-			timer.schedule(new ZasshokuTweet(twitterAPI), delay, tweetPeriod);
-		}
-		if (zasshokuP.getProperty("ZasshokuReply") != null && zasshokuP.getProperty("ZasshokuReply").equals("true")) {
-			List<String> zasshokuUsersStrings = FileIO.readAllLines(Paths.get("ZasshokuUsers.dat"));
-			List<ZasshokuUser> zasshokuUsers = new ArrayList<>();
-			if(zasshokuUsersStrings != null && !zasshokuUsersStrings.isEmpty()){
-				for(String line : zasshokuUsersStrings){
-					String[] elements = line.split(",");
-					try {
-						ZasshokuUser newUser = new ZasshokuUser(Long.parseLong(elements[0]), elements[1], Integer.parseInt(elements[3]));
+		try {
+			if (isTweet) {
+				long tweetPeriod = TimeUnit.MINUTES
+						.toMillis(Long.parseLong(zasshokuP.getProperty("ZasshokuTweetPeriod")));
+				timer.schedule(new ZasshokuTweet(twitterAPI, zassyokuRatio, zassyokuID), delay, tweetPeriod);
+			}
+			if (isReply) {
+				List<String> zasshokuUsersStrings = FileIO.readAllLines(Paths.get("ZasshokuUsers.dat"));
+				List<ZasshokuUser> zasshokuUsers = new ArrayList<>();
+				if (zasshokuUsersStrings != null && !zasshokuUsersStrings.isEmpty()) {
+					for (String line : zasshokuUsersStrings) {
+						String[] elements = line.split(",");
+						ZasshokuUser newUser = new ZasshokuUser(Long.parseLong(elements[0]), elements[1],
+								Integer.parseInt(elements[3]));
 						zasshokuUsers.add(newUser);
-					} catch (Exception e){
-						System.err.println("ZasshokuUsers.dat に不正なデータが記述されているため停止します");
-						System.exit(1);
 					}
 				}
+				long replyPeriod = TimeUnit.MINUTES
+						.toMillis(Long.parseLong(zasshokuP.getProperty("ZasshokuReplyPeriod")));
+				int replyCountLimit = Integer.parseInt(zasshokuP.getProperty("ZasshokuReplyCountLimit"));
+				timer.schedule(new ZasshokuReply(twitterAPI, replyCountLimit, zasshokuUsers, "ZasshokuUsers.dat", zassyokuRatio, zassyokuID),
+						delay, replyPeriod);
 			}
-			long replyPeriod = TimeUnit.MINUTES.toMillis(Long.parseLong(zasshokuP.getProperty("ZasshokuReplyPeriod")));
-			timer.schedule(new ZasshokuReply(twitterAPI, zasshokuUsers, "ZasshokuUsers.dat"), delay, replyPeriod);
-		}
-		if (zasshokuP.getProperty("FollowCheck") != null && zasshokuP.getProperty("FollowCheck").equals("true")) {
-			long followCheckPeriod = TimeUnit.MINUTES
-					.toMillis(Long.parseLong(zasshokuP.getProperty("FollowCheckPeriod")));
-			timer.schedule(new PeriodicFollowCheckTimerTask(twitterAPI), delay, followCheckPeriod);
-		}
-		if (zasshokuP.getProperty("PiggybackingRetweet") != null
-				&& zasshokuP.getProperty("PiggybackingRetweet").equals("true")) {
-			long piggybackingRetweetPeriod = TimeUnit.MINUTES
-					.toMillis(Long.parseLong(zasshokuP.getProperty("PiggyBackingRetweetPeriod")));
-			timer.schedule(new PeriodicPiggybackingRetweetTimerTask(twitterAPI), delay, piggybackingRetweetPeriod);
+			if (isFollowCheck) {
+				long followCheckPeriod = TimeUnit.MINUTES
+						.toMillis(Long.parseLong(zasshokuP.getProperty("FollowCheckPeriod")));
+				timer.schedule(new PeriodicFollowCheckTimerTask(twitterAPI), delay, followCheckPeriod);
+			}
+			if (isRetweet) {
+				long piggybackingRetweetPeriod = TimeUnit.MINUTES
+						.toMillis(Long.parseLong(zasshokuP.getProperty("PiggyBackingRetweetPeriod")));
+				timer.schedule(new PeriodicPiggybackingRetweetTimerTask(twitterAPI), delay, piggybackingRetweetPeriod);
+			}
+		} catch (Exception e) {
+			System.err.println("zasshoku.propertiesまたはZasshokuUsers.datに不正な記述があります");
+			e.printStackTrace();
+			System.exit(1);
 		}
 
 	}

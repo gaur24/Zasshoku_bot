@@ -272,7 +272,7 @@ public class TwitterAPI {
 	 * [GET statuses/home_timeline]APIを1消費する
 	 * 
 	 * @param count
-	 *            <= 200
+	 *            (1 <= count <= 200)
 	 * @return ResponseList
 	 * @throws TwitterException
 	 */
@@ -287,6 +287,7 @@ public class TwitterAPI {
 	 * statuses/home_timeline]APIを1消費する
 	 * 
 	 * @param count
+	 *            (1 <= count <= 200)
 	 * @return ResponseList
 	 * @throws TwitterException
 	 */
@@ -296,7 +297,7 @@ public class TwitterAPI {
 		// 本当にリストの最後が最新なんだっけ？
 		// TODO
 		Long lhtid = homeTimeline.get(homeTimeline.size() - 1).getId();
-		if(lastHomeTimelineID < lhtid){
+		if (lastHomeTimelineID < lhtid) {
 			lastHomeTimelineID = lhtid;
 			FileIO.write(LAST_HOME_TIMELINE_ID_PATH, lastHomeTimelineID.toString());
 		} else {
@@ -304,6 +305,20 @@ public class TwitterAPI {
 			System.out.println("getHomeTimelineMemory : ここが呼ばれるとするとロジックがおかしいので確認しないといけませんねぇ");
 		}
 		return homeTimeline;
+	}
+
+	/**
+	 * 特定のユーザーのタイムラインから最新count件を取得し、ResponseListに格納して返す<br>
+	 * [GET statuses/user_timeline]APIを1消費する
+	 * 
+	 * @param count
+	 *            (1 <= count <= 200)
+	 * @return ResponseList
+	 * @throws TwitterException
+	 */
+	public ResponseList<Status> getUserTimeline(long userID, int count) throws TwitterException {
+		Paging paging = new Paging(1, count);
+		return twitter.getUserTimeline(userID, paging);
 	}
 
 	/**
@@ -324,7 +339,7 @@ public class TwitterAPI {
 	 * [GET statuses/mentions_timeline]APIを1消費する
 	 * 
 	 * @param count
-	 *            <= 200
+	 *            (1 <= count <= 200)
 	 * @return ResponseList
 	 * @throws TwitterException
 	 */
@@ -369,27 +384,27 @@ public class TwitterAPI {
 		updateLastReplyID(inReplyToStatusId);
 
 	}
-	
+
 	/**
 	 * 返事をしないリプライを通知します<br>
 	 * 通知しない場合、getMentions()した時に再び取得されます
 	 * 
 	 * @param statusID
 	 */
-	public void doNotReplyToThisTweet(long statusID){
+	public void doNotReplyToThisTweet(long statusID) {
 		// 内部的にはlastReplyIDを更新するだけ
 		updateLastReplyID(statusID);
 	}
-	
+
 	/**
 	 * lastReplyIDを更新する<br>
 	 * ファイル更新も同時に行う
 	 * 
 	 * @param statusID
 	 */
-	private void updateLastReplyID(long statusID){
+	private void updateLastReplyID(long statusID) {
 		// 値が古ければ更新しない
-		if(lastReplyID >= statusID){
+		if (lastReplyID >= statusID) {
 			return;
 		}
 		lastReplyID = statusID;
