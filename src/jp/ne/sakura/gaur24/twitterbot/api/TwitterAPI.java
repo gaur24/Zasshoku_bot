@@ -16,6 +16,7 @@ import twitter4j.Status;
 import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.User;
 
 /**
  * 主要なTwitter API提供するクラス
@@ -150,6 +151,18 @@ public class TwitterAPI {
 			System.exit(1);
 		}
 
+	}
+	
+	/**
+	 * ユーザーIDからユーザー情報を取得<br>
+	 * [GET users/show]APIを1消費
+	 * 
+	 * @param userID
+	 * @return User
+	 * @throws TwitterException
+	 */
+	public User showUser(long userID) throws TwitterException {
+		return twitter.showUser(userID);
 	}
 
 	/**

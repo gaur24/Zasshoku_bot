@@ -42,7 +42,8 @@ public class ZasshokuBot {
 			if (isTweet) {
 				long tweetPeriod = TimeUnit.MINUTES
 						.toMillis(Long.parseLong(zasshokuP.getProperty("ZasshokuTweetPeriod")));
-				timer.schedule(new ZasshokuTweet(twitterAPI, zassyokuRatio, zassyokuID), delay, tweetPeriod);
+				int startReplyRatio = Integer.parseInt(zasshokuP.getProperty("ZasshokuTweetStartReplyRatio"));
+				timer.schedule(new ZasshokuTweet(twitterAPI, zassyokuRatio, zassyokuID, startReplyRatio), delay, tweetPeriod);
 			}
 			if (isReply) {
 				List<String> zasshokuUsersStrings = FileIO.readAllLines(Paths.get("ZasshokuUsers.dat"));
