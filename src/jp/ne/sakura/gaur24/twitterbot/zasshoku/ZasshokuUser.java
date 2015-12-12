@@ -135,6 +135,10 @@ public class ZasshokuUser {
 	public long getUserID() {
 		return userID;
 	}
+	
+	public void setScreenName(String screenName) {
+		this.screenName = screenName;
+	}
 
 	public String getScreenName() {
 		return screenName;
@@ -157,7 +161,7 @@ public class ZasshokuUser {
 	 */
 	@Override
 	public String toString() {
-		return screenName + "," + level + "," + totalExp;
+		return userID + "," + screenName + "," + level + "," + totalExp;
 	}
 
 }

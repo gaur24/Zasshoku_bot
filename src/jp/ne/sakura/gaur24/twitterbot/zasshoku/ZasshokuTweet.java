@@ -1,6 +1,7 @@
 package jp.ne.sakura.gaur24.twitterbot.zasshoku;
 
-import jp.ne.sakura.gaur24.twitterbot.api.*;
+import jp.ne.sakura.gaur24.twitterbot.api.PeriodicTweetTimerTask;
+import jp.ne.sakura.gaur24.twitterbot.api.TwitterAPI;
 import jp.ne.sakura.gaur24.twitterbot.zasshoku.markov.MarkovController;
 import twitter4j.ResponseList;
 import twitter4j.Status;
