@@ -52,7 +52,7 @@ public class ZasshokuBot {
 					for (String line : zasshokuUsersStrings) {
 						String[] elements = line.split(",");
 						ZasshokuUser newUser = new ZasshokuUser(Long.parseLong(elements[0]), elements[1],
-								Integer.parseInt(elements[3]));
+								Integer.parseInt(elements[3]), elements[4].equals("1"));
 						zasshokuUsers.add(newUser);
 					}
 				}

@@ -8,7 +8,7 @@ public class ZasshokuUser {
 	// Twitterのアカウント固有のユーザーID
 	private long userID;
 
-	// ファイル書き込み時に使用するScreenNameを保持
+	// ScreenNameを保持。ファイル書き込み時に使用
 	private String screenName;
 
 	// これまでに取得した総経験値
@@ -19,6 +19,9 @@ public class ZasshokuUser {
 
 	// 現在のレベル
 	private int level;
+
+	// 鍵垢であればtrue。ファイル書き込み時に使用
+	private boolean isProtected;
 
 	/**
 	 * 経験値の上限。このくらいじゃないと計算時間がやばいのでチェックする。
@@ -35,10 +38,13 @@ public class ZasshokuUser {
 	 * 
 	 * @param userID
 	 * @param screenName
+	 * @param isProtected
+	 *            鍵垢ならtrue
 	 */
-	public ZasshokuUser(long userID, String screenName) {
+	public ZasshokuUser(long userID, String screenName, boolean isProtected) {
 		this.userID = userID;
 		this.screenName = screenName;
+		this.isProtected = isProtected;
 
 		// 初期ステータス
 		this.totalExp = 0;
@@ -54,11 +60,14 @@ public class ZasshokuUser {
 	 * @param userID
 	 * @param screenName
 	 * @param totalExp
+	 * @param isProtected
+	 *            鍵垢ならtrue
 	 */
-	public ZasshokuUser(long userID, String screenName, int totalExp) {
+	public ZasshokuUser(long userID, String screenName, int totalExp, boolean isProtected) {
 		// まずは新規ユーザーとしてパラメータを設定
 		this.userID = userID;
 		this.screenName = screenName;
+		this.isProtected = isProtected;
 		this.totalExp = 0;
 		this.level = 1;
 		this.nextLevelUpTotalExp = calcNextLevelUpTotalExp(this.level);
@@ -135,7 +144,7 @@ public class ZasshokuUser {
 	public long getUserID() {
 		return userID;
 	}
-	
+
 	public void setScreenName(String screenName) {
 		this.screenName = screenName;
 	}
@@ -155,13 +164,27 @@ public class ZasshokuUser {
 	public int getLevel() {
 		return level;
 	}
-	
+
+	public boolean isProtected() {
+		return isProtected;
+	}
+
+	public void setProtected(boolean isProtected) {
+		this.isProtected = isProtected;
+	}
+
 	/**
 	 * ファイル出力用にユーザー情報を出力
 	 */
 	@Override
 	public String toString() {
-		return userID + "," + screenName + "," + level + "," + totalExp;
+		String protect;
+		if(isProtected){
+			protect = "1";
+		} else {
+			protect = "0";
+		}
+		return userID + "," + screenName + "," + level + "," + totalExp + "," + protect;
 	}
 
 }

@@ -98,12 +98,15 @@ public class ZasshokuReply extends PeriodicReplyTimerTask {
 			}
 			// ScreenNameを更新
 			user.setScreenName(mention.getUser().getScreenName());
+			// 鍵垢かどうかを更新
+			user.setProtected(mention.getUser().isProtected());
 			logger.log(Level.FINE, "ユーザー @" + user.getScreenName() + "に経験値を" + EXP_REPLY + "付与しました");
 			isExistingUser = true;
 			break;
 		}
+		// 新規ユーザーなら
 		if (!isExistingUser) {
-			ZasshokuUser newUser = new ZasshokuUser(mention.getUser().getId(), mention.getUser().getScreenName());
+			ZasshokuUser newUser = new ZasshokuUser(mention.getUser().getId(), mention.getUser().getScreenName(), mention.getUser().isProtected());
 			newUser.gainExp(EXP_REPLY);
 			zasshokuUsers.add(newUser);
 			logger.log(Level.FINE, "ユーザー @" + newUser.getScreenName() + "を追加し、経験値を" + EXP_REPLY + "付与しました");
